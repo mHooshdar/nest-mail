@@ -11,10 +11,6 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
-    envConfig,
-    TypeOrmModule.forRoot(typeOrmConfig),
-    AuthModule,
-  ],
+  imports: [envConfig, TypeOrmModule.forRoot(typeOrmConfig), AuthModule],
 })
 export class AppModule {}
