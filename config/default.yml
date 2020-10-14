@@ -8,3 +8,8 @@ db:
 
 jwt:
   expiresIn: 3600
+
+imap:
+  host: 'webmail.aut.ac.ir'
+  port: 993
+ 
