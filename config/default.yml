@@ -1,0 +1,10 @@
+server:
+  port: 3000 # PORT
+
+db:
+  type: 'postgres' # DB_TYPE
+  port: 5432 # DB_PORT
+  database: 'name' # DB_NAME
+
+jwt:
+  expiresIn: 3600
