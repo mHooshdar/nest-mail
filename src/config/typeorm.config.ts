@@ -11,6 +11,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD || dbConfig.password,
   database: process.env.DB_NAME || dbConfig.database,
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
-  // url: process.env.DATABASE_URL,
+  url: process.env.DATABASE_URL,
   synchronize: process.env.DB_SYNCHRONIZE || dbConfig.synchronize,
 };
