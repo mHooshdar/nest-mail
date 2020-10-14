@@ -18,7 +18,8 @@ export class MailsService {
     const imapConnection = await this.imapService.createConnection(user);
     await imapConnection.openBox('INBOX');
     // $ Starts at 1 not Zero
-    const searchCriteria = [`${offset + limit}:${offset + limit - 1}`, 'ALL'];
+    const searchCriteria = [`${offset}:${offset + limit - 1}`, 'ALL'];
+    
     const fetchOptions = { bodies: ['HEADER', 'TEXT', ''] };
     const messages = await imapConnection.search(searchCriteria, fetchOptions);
     const mails = await Promise.all(
