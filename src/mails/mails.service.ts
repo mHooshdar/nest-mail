@@ -2,7 +2,7 @@ import { MessageBodyPart, Message, ImapSimple } from 'imap-simple';
 import { simpleParser } from 'mailparser';
 import Mail = require('nodemailer/lib/mailer');
 import _find = require('lodash/find');
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { ImapService } from 'src/imap/imap.service';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
@@ -63,11 +63,14 @@ export class MailsService {
     return mails;
   }
 
-  async getMail(id: number, user: User): Promise<MailDetailResponse> {
+  async getMail(
+    id: number,
+    user: User,
+    returnConnection?: boolean,
+  ): Promise<MailDetailResponse | ImapSimple> {
     const imapConnection: ImapSimple = await this.imapService.createConnection(
       user,
     );
-
     await imapConnection.openBox('INBOX');
 
     const searchCriteria = [['UID', `${id}`]];
@@ -93,14 +96,23 @@ export class MailsService {
         return result;
       }),
     );
+
+    if (!response.length) {
+      throw new NotFoundException();
+    }
+
+    if (returnConnection) {
+      return imapConnection;
+    }
+
     imapConnection.end();
     return response[0];
   }
 
   async deleteMail(id: number, user: User): Promise<void> {
-    const imapConnection: any = await this.imapService.createConnection(user);
-    await imapConnection.openBox('INBOX');
-    imapConnection.deleteMessage(id);
+    const imapConnection: any = await this.getMail(id, user, true);
+    await imapConnection.deleteMessage(id);
+    imapConnection.end();
   }
 
   async sendEmail(sendMailDto: SendMailDto, user: User): Promise<void> {

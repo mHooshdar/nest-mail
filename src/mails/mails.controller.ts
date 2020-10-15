@@ -11,6 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ImapSimple } from 'imap-simple';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
@@ -39,7 +40,7 @@ export class MailsController {
   async getMail(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
-  ): Promise<MailDetailResponse> {
+  ): Promise<MailDetailResponse | ImapSimple> {
     return this.mailsService.getMail(id, user);
   }
 
