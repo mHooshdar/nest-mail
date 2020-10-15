@@ -10,13 +10,15 @@ const envConfig = ConfigModule.forRoot({
 import { typeOrmConfig } from './config/typeorm.config';
 import { AuthModule } from './auth/auth.module';
 import { MailsModule } from './mails/mails.module';
+import { BoxesModule } from './boxes/boxes.module';
 
 @Module({
   imports: [
     envConfig,
     TypeOrmModule.forRoot(typeOrmConfig),
-    MailsModule,
     AuthModule,
+    MailsModule,
+    BoxesModule,
   ],
 })
 export class AppModule {}
