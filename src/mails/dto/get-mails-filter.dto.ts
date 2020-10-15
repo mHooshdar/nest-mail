@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class GetMailsFilterDto {
   @IsOptional()
@@ -8,4 +8,8 @@ export class GetMailsFilterDto {
   @IsOptional()
   @IsNumber()
   limit: number;
+
+  @IsOptional()
+  @IsString()
+  box: string;
 }

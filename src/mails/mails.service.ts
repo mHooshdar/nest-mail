@@ -23,11 +23,11 @@ export class MailsService {
     filterDto: GetMailsFilterDto,
     user: User,
   ): Promise<MailResponse[]> {
-    const { offset = 1, limit = 10 } = filterDto;
+    const { offset = 1, limit = 10, box = 'INBOX' } = filterDto;
     const imapConnection: ImapSimple = await this.imapService.createConnection(
       user,
     );
-    await imapConnection.openBox('INBOX');
+    await imapConnection.openBox(box);
 
     // $ Starts at 1 not Zero
     const searchCriteria = [`${offset}:${offset + limit - 1}`];
@@ -65,13 +65,14 @@ export class MailsService {
 
   async getMail(
     id: number,
+    box = 'INBOX',
     user: User,
     returnConnection?: boolean,
   ): Promise<MailDetailResponse | ImapSimple> {
     const imapConnection: ImapSimple = await this.imapService.createConnection(
       user,
     );
-    await imapConnection.openBox('INBOX');
+    await imapConnection.openBox(box);
 
     const searchCriteria = [['UID', `${id}`]];
     const fetchOptions = { bodies: [''], markSeen: true };
@@ -109,8 +110,8 @@ export class MailsService {
     return response[0];
   }
 
-  async deleteMail(id: number, user: User): Promise<void> {
-    const imapConnection: any = await this.getMail(id, user, true);
+  async deleteMail(id: number, box: string, user: User): Promise<void> {
+    const imapConnection: any = await this.getMail(id, box, user, true);
     await imapConnection.deleteMessage(id);
     imapConnection.end();
   }

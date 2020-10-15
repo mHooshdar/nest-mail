@@ -30,26 +30,29 @@ export class MailsController {
   async getMails(
     @Query('offset', ParseIntPipe) offset: number,
     @Query('limit', ParseIntPipe) limit: number,
+    @Query('box') box: string,
     @GetUser() user: User,
   ): Promise<MailResponse[]> {
-    const filterDto: GetMailsFilterDto = { offset, limit };
+    const filterDto: GetMailsFilterDto = { offset, limit, box };
     return this.mailsService.getMails(filterDto, user);
   }
 
   @Get(':id')
   async getMail(
     @Param('id', ParseIntPipe) id: number,
+    @Query('box') box: string,
     @GetUser() user: User,
   ): Promise<MailDetailResponse | ImapSimple> {
-    return this.mailsService.getMail(id, user);
+    return this.mailsService.getMail(id, box, user);
   }
 
   @Delete(':id')
   async deleteMail(
     @Param('id', ParseIntPipe) id: number,
+    @Query('box') box: string,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.mailsService.deleteMail(id, user);
+    return this.mailsService.deleteMail(id, box, user);
   }
 
   @Post()
