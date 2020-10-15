@@ -17,6 +17,7 @@ import { User } from 'src/auth/user.entity';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
 import { MailDetailResponse } from './dto/mail-detail-response.dto';
 import { MailResponse } from './dto/mail-response.dto';
+import { MoveMessageDto } from './dto/move-message.dto';
 import { SendMailDto } from './dto/send-mail.dto';
 import { MailsService } from './mails.service';
 
@@ -61,5 +62,14 @@ export class MailsController {
     @GetUser() user: User,
   ): Promise<void> {
     this.mailsService.sendEmail(sendMailDto, user);
+  }
+
+  @Post('move/:id')
+  async moveMessage(
+    @Param('id') mailId: string,
+    @Body(ValidationPipe) moveMessageDto: MoveMessageDto,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.mailsService.moveMessage(mailId, moveMessageDto, user);
   }
 }

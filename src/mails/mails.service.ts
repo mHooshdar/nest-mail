@@ -11,6 +11,7 @@ import { generateEmailAddress, generateEmailObject } from './utils';
 import { MailDetailResponse } from './dto/mail-detail-response.dto';
 import { SmtpService } from 'src/smtp/smtp.service';
 import { SendMailDto } from './dto/send-mail.dto';
+import { MoveMessageDto } from './dto/move-message.dto';
 
 @Injectable()
 export class MailsService {
@@ -130,5 +131,24 @@ export class MailsService {
       attachments,
     };
     await smtpTransporter.sendMail(mailOptions);
+  }
+
+  async moveMessage(
+    mailId: string,
+    moveMessage: MoveMessageDto,
+    user: User,
+  ): Promise<void> {
+    const { destination, source } = moveMessage;
+
+    const imapConnection: ImapSimple = await this.imapService.createConnection(
+      user,
+    );
+    await imapConnection.openBox(source);
+
+    try {
+      await imapConnection.moveMessage(mailId, destination);
+    } catch (e) {
+      throw new NotFoundException();
+    }
   }
 }
