@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -36,5 +37,10 @@ export class MailsController {
     @GetUser() user,
   ): Promise<MailDetailResponse> {
     return this.mailsService.getMail(id, user);
+  }
+
+  @Delete(':id')
+  deleteMail(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
+    return this.mailsService.deleteMail(id, user);
   }
 }

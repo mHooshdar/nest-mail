@@ -1,4 +1,4 @@
-import { MessageBodyPart, Message } from 'imap-simple';
+import { MessageBodyPart, Message, ImapSimple } from 'imap-simple';
 import { simpleParser } from 'mailparser';
 import _find = require('lodash/find');
 import { Injectable } from '@nestjs/common';
@@ -18,7 +18,9 @@ export class MailsService {
     user: User,
   ): Promise<MailResponse[]> {
     const { offset = 1, limit = 10 } = filterDto;
-    const imapConnection = await this.imapService.createConnection(user);
+    const imapConnection: ImapSimple = await this.imapService.createConnection(
+      user,
+    );
     await imapConnection.openBox('INBOX');
 
     // $ Starts at 1 not Zero
@@ -55,7 +57,9 @@ export class MailsService {
   }
 
   async getMail(id: number, user: User): Promise<MailDetailResponse> {
-    const imapConnection = await this.imapService.createConnection(user);
+    const imapConnection: ImapSimple = await this.imapService.createConnection(
+      user,
+    );
 
     await imapConnection.openBox('INBOX');
 
@@ -83,5 +87,11 @@ export class MailsService {
     );
     imapConnection.end();
     return response[0];
+  }
+
+  async deleteMail(id: number, user: User) {
+    const imapConnection: any = await this.imapService.createConnection(user);
+    await imapConnection.openBox('INBOX');
+    imapConnection.deleteMessage(id);
   }
 }
