@@ -1,11 +1,6 @@
 import { EmailAddress, ParsedMail } from 'mailparser';
+import { MailResponse } from './mail-response.dto';
 
-export class MailDetailResponse {
-  id: number;
-  subject: string;
+export class MailDetailResponse extends MailResponse {
   html: ParsedMail['html'];
-  date: ParsedMail['date'];
-  from: EmailAddress[];
-  to: EmailAddress[];
-  cc: EmailAddress[];
 }

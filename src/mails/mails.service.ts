@@ -1,17 +1,23 @@
 import { MessageBodyPart, Message, ImapSimple } from 'imap-simple';
 import { simpleParser } from 'mailparser';
+import Mail = require('nodemailer/lib/mailer');
 import _find = require('lodash/find');
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { ImapService } from 'src/imap/imap.service';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
 import { MailResponse } from './dto/mail-response.dto';
-import { generateEmailObject } from './utils';
+import { generateEmailAddress, generateEmailObject } from './utils';
 import { MailDetailResponse } from './dto/mail-detail-response.dto';
+import { SmtpService } from 'src/smtp/smtp.service';
+import { SendMailDto } from './dto/send-mail.dto';
 
 @Injectable()
 export class MailsService {
-  constructor(private imapService: ImapService) {}
+  constructor(
+    private imapService: ImapService,
+    private smtpService: SmtpService,
+  ) {}
 
   async getMails(
     filterDto: GetMailsFilterDto,
@@ -47,6 +53,7 @@ export class MailsService {
           date: body.date[0],
           from,
           to,
+          cc: body.cc ? generateEmailAddress(body.cc[0]) : [],
           seen: item.attributes.flags.includes('\\Seen'),
         };
         return resultMail;
@@ -81,6 +88,7 @@ export class MailsService {
           from: mail.from.value,
           to: mail.to.value,
           cc: mail.cc ? mail.cc.value : [],
+          seen: true,
         };
         return result;
       }),
@@ -89,9 +97,28 @@ export class MailsService {
     return response[0];
   }
 
-  async deleteMail(id: number, user: User) {
+  async deleteMail(id: number, user: User): Promise<void> {
     const imapConnection: any = await this.imapService.createConnection(user);
     await imapConnection.openBox('INBOX');
     imapConnection.deleteMessage(id);
+  }
+
+  async sendEmail(sendMailDto: SendMailDto, user: User): Promise<void> {
+    const smtpTransporter = await this.smtpService.createConnection(user);
+    const { subject, html, to, cc = [], attachments = [] } = sendMailDto;
+
+    const { username } = user;
+    const mailOptions: Mail.Options = {
+      from: `<${username}@aut.ac.ir>`, // sender address
+      to, // list of receivers
+      subject, // Subject line
+      html, // html body
+      cc,
+      attachments,
+    };
+    const info = await smtpTransporter.sendMail(mailOptions);
+    console.log(info);
+    
+    return null;
   }
 }

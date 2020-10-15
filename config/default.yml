@@ -12,4 +12,8 @@ jwt:
 imap:
   host: 'webmail.aut.ac.ir'
   port: 993
+
+smtp:
+  host: 'webmail.aut.ac.ir'
+  port: 25
  

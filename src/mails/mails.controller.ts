@@ -1,17 +1,22 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   Param,
   ParseIntPipe,
+  Post,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/auth/user.entity';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
 import { MailDetailResponse } from './dto/mail-detail-response.dto';
 import { MailResponse } from './dto/mail-response.dto';
+import { SendMailDto } from './dto/send-mail.dto';
 import { MailsService } from './mails.service';
 
 @Controller('mails')
@@ -20,26 +25,37 @@ export class MailsController {
   constructor(private mailsService: MailsService) {}
 
   @Get()
-  // getMails(@Query() filterDto: GetMailsFilterDto): Promise<Mail[]> {
-  getMails(
+  // async getMails(@Query() filterDto: GetMailsFilterDto): Promise<Mail[]> {
+  async getMails(
     @Query('offset', ParseIntPipe) offset: number,
     @Query('limit', ParseIntPipe) limit: number,
-    @GetUser() user,
+    @GetUser() user: User,
   ): Promise<MailResponse[]> {
     const filterDto: GetMailsFilterDto = { offset, limit };
     return this.mailsService.getMails(filterDto, user);
   }
 
   @Get(':id')
-  getMail(
+  async getMail(
     @Param('id', ParseIntPipe) id: number,
-    @GetUser() user,
+    @GetUser() user: User,
   ): Promise<MailDetailResponse> {
     return this.mailsService.getMail(id, user);
   }
 
   @Delete(':id')
-  deleteMail(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
+  async deleteMail(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<void> {
     return this.mailsService.deleteMail(id, user);
+  }
+
+  @Post()
+  async sendEmail(
+    @Body(ValidationPipe) sendMailDto: SendMailDto,
+    @GetUser() user: User,
+  ): Promise<void> {
+    this.mailsService.sendEmail(sendMailDto, user);
   }
 }

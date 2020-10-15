@@ -28,3 +28,9 @@ export function generateEmailObject(sender: string): EmailAddress[] {
 
   return result;
 }
+
+export const generateEmailAddress = email =>
+  email.split(', ').map(address => ({
+    name: '',
+    address,
+  }));
