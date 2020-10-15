@@ -21,7 +21,9 @@ export class AuthService {
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
     const { username } = authCredentialsDto;
-    await this.imapService.createConnection(authCredentialsDto);
+    const connection = await this.imapService.createConnection(
+      authCredentialsDto,
+    );
     await this.userRepository.addUser(authCredentialsDto);
 
     const payload: JwtPayload = { username };
@@ -29,6 +31,7 @@ export class AuthService {
     this.logger.debug(
       `Generated JWT Token with payload ${JSON.stringify(payload)}`,
     );
+    connection.end();
     return { accessToken };
   }
 }
