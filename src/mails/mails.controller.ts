@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ParsedMail } from 'mailparser';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
 import { MailDetailResponse } from './dto/mail-detail-response.dto';

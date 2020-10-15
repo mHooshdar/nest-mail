@@ -11,10 +11,10 @@ export function generateEmailObject(sender: string): EmailAddress[] {
     const splitedSender = splitedSections[i].split(' <');
 
     if (splitedSender.length === 1) {
-      address = splitedSender[0].slice(0, -1);
+      address = splitedSender[0].replace(/[<> ]/, '');
     } else {
       const tempName = splitedSender[0].replace(/"/g, '');
-      address = splitedSender[1].slice(0, -1);
+      address = splitedSender[1].replace(/[<> ]/, '');
       if (tempName && tempName !== address) {
         name = tempName;
       }
@@ -22,8 +22,8 @@ export function generateEmailObject(sender: string): EmailAddress[] {
 
     result.push({
       name,
-      address
-    })
+      address,
+    });
   }
 
   return result;

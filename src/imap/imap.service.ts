@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import config = require('config');
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credential.dto';
 import imaps = require('imap-simple');
