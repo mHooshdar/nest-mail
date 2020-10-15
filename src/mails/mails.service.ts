@@ -1,5 +1,5 @@
-import { MessageBodyPart } from 'imap-simple';
-import { ParsedMail, simpleParser } from 'mailparser';
+import { MessageBodyPart, Message } from 'imap-simple';
+import { simpleParser } from 'mailparser';
 import _find = require('lodash/find');
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
@@ -26,7 +26,10 @@ export class MailsService {
 
     const fetchOptions = { bodies: ['HEADER'] };
 
-    const messages = await imapConnection.search(searchCriteria, fetchOptions);
+    const messages: Message[] = await imapConnection.search(
+      searchCriteria,
+      fetchOptions,
+    );
     const mails = await Promise.all(
       messages.map(async item => {
         const { body }: MessageBodyPart = _find(item.parts, {
@@ -42,11 +45,12 @@ export class MailsService {
           date: body.date[0],
           from,
           to,
+          seen: item.attributes.flags.includes('\\Seen'),
         };
         return resultMail;
       }),
     );
-    imapConnection.end()
+    imapConnection.end();
     return mails;
   }
 
@@ -56,7 +60,7 @@ export class MailsService {
     await imapConnection.openBox('INBOX');
 
     const searchCriteria = [['UID', `${id}`]];
-    const fetchOptions = { bodies: [''] };
+    const fetchOptions = { bodies: [''], markSeen: true };
 
     const messages = await imapConnection.search(searchCriteria, fetchOptions);
     const response = await Promise.all(
@@ -77,7 +81,7 @@ export class MailsService {
         return result;
       }),
     );
-    imapConnection.end()
+    imapConnection.end();
     return response[0];
   }
 }

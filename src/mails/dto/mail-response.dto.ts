@@ -6,4 +6,5 @@ export class MailResponse {
   date: string;
   from: EmailAddress[];
   to: EmailAddress[];
+  seen: boolean;
 }
