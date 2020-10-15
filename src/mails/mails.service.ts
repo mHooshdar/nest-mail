@@ -116,9 +116,6 @@ export class MailsService {
       cc,
       attachments,
     };
-    const info = await smtpTransporter.sendMail(mailOptions);
-    console.log(info);
-    
-    return null;
+    await smtpTransporter.sendMail(mailOptions);
   }
 }
