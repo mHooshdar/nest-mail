@@ -1,8 +1,9 @@
 import { EmailAddress, ParsedMail } from 'mailparser';
 
 export class MailResponse {
+  id: number;
   subject: ParsedMail['subject'];
-  html: ParsedMail['html'];
+  date: string;
   from: EmailAddress[];
   to: EmailAddress[];
 }

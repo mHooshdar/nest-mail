@@ -1,10 +1,34 @@
+import { MessageBodyPart } from 'imap-simple';
 import _find = require('lodash/find');
 import { Injectable } from '@nestjs/common';
-import { ParsedMail, simpleParser } from 'mailparser';
 import { User } from 'src/auth/user.entity';
 import { ImapService } from 'src/imap/imap.service';
 import { GetMailsFilterDto } from './dto/get-mails-filter.dto';
 import { MailResponse } from './dto/mail-response.dto';
+import { EmailAddress } from 'mailparser';
+
+function generateEmailObject (sender: string): EmailAddress {
+  const splitedSender = sender.split('<');
+  let name = '';
+  let address = '';
+
+  if (splitedSender.length === 1) {
+    address = splitedSender[0].slice(0, -1);
+  } else {
+    console.log(splitedSender[0]);
+    
+    const tempName = splitedSender[0].replace(/"/g, '').slice(0, -1);
+    address = splitedSender[1].slice(0, -1);
+    if (tempName && tempName !== address) {
+      name = tempName;
+    }
+  }
+
+  return {
+    name,
+    address,
+  };
+};
 
 @Injectable()
 export class MailsService {
@@ -19,20 +43,24 @@ export class MailsService {
     await imapConnection.openBox('INBOX');
     // $ Starts at 1 not Zero
     const searchCriteria = [`${offset}:${offset + limit - 1}`, 'ALL'];
-    
-    const fetchOptions = { bodies: ['HEADER', 'TEXT', ''] };
+
+    const fetchOptions = { bodies: ['HEADER'] };
     const messages = await imapConnection.search(searchCriteria, fetchOptions);
     const mails = await Promise.all(
       messages.map(async item => {
-        const all = _find(item.parts, { which: '' });
+        const { body }: MessageBodyPart = _find(item.parts, {
+          which: 'HEADER',
+        });
         const id = item.attributes.uid;
-        const idHeader = `Imap-Id: ${id}\r\n`;
-        const mail: ParsedMail = await simpleParser(idHeader + all.body);
+        const from = body.from.map(from => generateEmailObject(from))
+        const to = body.to.map(to => generateEmailObject(to))
+
         const resultMail: MailResponse = {
-          subject: mail.subject,
-          html: mail.html,
-          from: mail.from.value,
-          to: mail.to.value,
+          id,
+          subject: body.subject[0],
+          date: body.date[0],
+          from,
+          to
         };
         return resultMail;
       }),

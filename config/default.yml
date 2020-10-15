@@ -7,7 +7,7 @@ db:
   database: 'name' # DB_NAME
 
 jwt:
-  expiresIn: 3600
+  expiresIn: 360000
 
 imap:
   host: 'webmail.aut.ac.ir'
